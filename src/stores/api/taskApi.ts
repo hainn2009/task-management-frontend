@@ -1,7 +1,4 @@
-import { Draft } from "@reduxjs/toolkit";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-// const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3000";
 
 export interface TaskType {
     id: string;
@@ -14,7 +11,7 @@ export interface TaskType {
 export const taskApi = createApi({
     reducerPath: "taskApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: "/api",
+        baseUrl: `${import.meta.env.VITE_API_BASE_URL}/api`,
         prepareHeaders: (headers, { getState }) => {
             const token = (getState() as { auth: { user: { accessToken: string } } }).auth.user.accessToken;
             if (token) {
