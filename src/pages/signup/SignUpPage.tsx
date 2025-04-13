@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "@mui/material/Button";
+import CircularProgress from '@mui/material/CircularProgress';
 import TextField from "@mui/material/TextField";
 import styled from "styled-components";
 
@@ -29,22 +30,27 @@ const SignUpPage = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const [signUp] = useSignUpMutation();
     const navigate = useNavigate();
 
     const submit = async () => {
         try {
+            setIsLoading(true);
             await signUp({ username, password }).unwrap();
+            setIsLoading(false);
             navigate("/signin");
         } catch (error) {
             if (isFetchBaseQueryError(error)) {
-                const errMsg = "error" in error ? error.error : JSON.stringify(error.data);
+                const errMsg = "error" in error ? error.error : (error?.data as { message?: string })?.message;
                 console.error("FetchBaseQueryError:", errMsg, { variant: "error" });
-                setErrorMessage(errMsg);
+                setErrorMessage(errMsg || "");
+                setIsLoading(false);
             } else if (isErrorWithMessage(error)) {
                 console.error("SerializedError:", error.message, { variant: "error" });
                 setErrorMessage(error.message);
+                setIsLoading(false);
             }
         }
     };
@@ -74,7 +80,7 @@ const SignUpPage = () => {
                 <hr />
                 <div>
                     <Button fullWidth variant="contained" color="primary" onClick={submit}>
-                        SIGN UP
+                        {isLoading && <CircularProgress color="inherit" size="18px" style={{ marginRight: "5px" }} />} SIGN UP
                     </Button>
                 </div>
             </FormContainer>

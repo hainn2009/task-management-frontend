@@ -3,6 +3,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import IconButton from "@mui/material/IconButton";
+import CircularProgress from '@mui/material/CircularProgress';
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
@@ -20,7 +21,7 @@ const CardTitle = styled.h1`
     font-size: 22px;
 `;
 
-const Task = ({ id, title, description, status }: TaskType) => {
+const Task = ({ id, title, description, status, isPending }: TaskType) => {
     const [deleteTask] = useDeleteTaskMutation();
     const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
@@ -39,7 +40,7 @@ const Task = ({ id, title, description, status }: TaskType) => {
                     <Grid justifyContent="space-between" container>
                         <Grid>
                             <FormControl style={{ width: "140px" }}>
-                                <Select value={status} onChange={handleStatusChange} displayEmpty>
+                                <Select value={status} onChange={handleStatusChange} disabled={isPending} displayEmpty>
                                     <MenuItem value={"OPEN"}>Open</MenuItem>
                                     <MenuItem value={"IN_PROGRESS"}>In Progress</MenuItem>
                                     <MenuItem value={"DONE"}>Done</MenuItem>
@@ -47,7 +48,8 @@ const Task = ({ id, title, description, status }: TaskType) => {
                             </FormControl>
                         </Grid>
                         <Grid>
-                            <IconButton onClick={() => deleteTask(id)}>
+                            {isPending && <span style={{ marginLeft: "10px" }}><CircularProgress color="inherit" size="18px" /></span>}
+                            <IconButton style={{ paddingLeft: 0 }} onClick={() => deleteTask(id)} disabled={isPending}>
                                 <DeleteIcon color="error" />
                             </IconButton>
                         </Grid>

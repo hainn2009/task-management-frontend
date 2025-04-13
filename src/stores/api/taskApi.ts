@@ -7,6 +7,7 @@ export interface TaskType {
     description: string;
     isCompleted: boolean;
     status: string;
+    isPending?: boolean;
 }
 
 export const taskApi = createApi({
@@ -40,21 +41,36 @@ export const taskApi = createApi({
                 method: "POST",
                 body: { title, description },
             }),
-            invalidatesTags: ["Tasks"],
+            // invalidatesTags: ["Tasks"],
             onQueryStarted: async ({ title, description }, { dispatch, queryFulfilled }) => {
+                const tempId = Date.now().toString();
+
                 const patchResult = dispatch(
                     taskApi.util.updateQueryData("getTasks", { search: "", status: "" }, (draftTasks: Draft<TaskType[]>) => {
                         draftTasks.push({
-                            id: Date.now().toString(),
+                            id: tempId,
                             title: title,
                             description: description,
                             isCompleted: false,
                             status: "OPEN",
+                            isPending: true,
                         });
                     })
                 );
                 try {
-                    await queryFulfilled;
+                    const { data: createdTask } =await queryFulfilled;
+
+                    dispatch(
+                        taskApi.util.updateQueryData("getTasks", { search: "", status: "" }, (draftTasks) => {
+                            const index = draftTasks.findIndex(task => task.id === tempId);
+                            if (index !== -1) {
+                                draftTasks[index] = {
+                                    ...createdTask,
+                                    isPending: false,
+                                };
+                            }
+                        })
+                    );
                 } catch {
                     patchResult.undo();
                 }

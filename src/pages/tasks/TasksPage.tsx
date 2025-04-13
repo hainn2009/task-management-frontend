@@ -55,7 +55,6 @@ const SignOutIconContainer = styled.div`
 const TasksPage = () => {
     const { search, status } = useAppSelector((state) => state.filters);
     const { data: tasks, error, isLoading } = useGetTasksQuery({ search, status });
-    console.log("mytasks", tasks);
     const user = useAppSelector((state) => state.auth.user) as User | null;
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -71,7 +70,7 @@ const TasksPage = () => {
         }
         // TODO tại sao chỗ này ae không truyền isCompleted
         return tasks.map((task) => (
-            <Task isCompleted={task.isCompleted} key={task.id} id={task.id} title={task.title} description={task.description} status={task.status} />
+            <Task isCompleted={task.isCompleted} key={task.id} id={task.id} title={task.title} description={task.description} status={task.status} isPending={task.isPending} />
         ));
     };
 
